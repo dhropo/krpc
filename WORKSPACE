@@ -155,8 +155,8 @@ http_file(
 
 http_file(
     name = 'python_sphinx',
-    url = 'https://pypi.python.org/packages/source/S/Sphinx/Sphinx-1.3.5.tar.gz',
-    sha256 = 'b7d133bb4990d010a2ad934c319b52d8a2156cb0491484f5e2a558619bc9ae04'
+    url = 'https://pypi.python.org/packages/source/S/Sphinx/Sphinx-1.4.1.tar.gz',
+    sha256 = 'c6871a784d24aba9270b6b28541537a57e2fcf4d7c799410eba18236bc76d6bc'
 )
 
 http_file(
@@ -271,4 +271,10 @@ http_file(
     name = 'python_snowballstemmer',
     url = 'https://pypi.python.org/packages/source/s/snowballstemmer/snowballstemmer-1.2.1.tar.gz',
     sha256 = '919f26a68b2c17a7634da993d91339e288964f93c274f1343e3bbbe2096e1128'
+)
+
+http_file(
+    name = 'python_imagesize',
+    url = 'https://pypi.python.org/packages/source/i/imagesize/imagesize-0.7.0.tar.gz',
+    sha256 = 'bb3d10fca0f66f771298d19035d8e6d01aaafb9ec8d9ae972dcb8acb2cf94f57'
 )

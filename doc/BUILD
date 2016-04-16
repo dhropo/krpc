@@ -53,6 +53,7 @@ py_script(
         '@python_babel//file',
         '@python_beautifulsoup4//file',
         '@python_docutils//file',
+        '@python_imagesize//file',
         '@python_javalang//file',
         '@python_jinja2//file',
         '@python_lxml//file',

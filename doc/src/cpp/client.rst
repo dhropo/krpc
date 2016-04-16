@@ -147,12 +147,12 @@ stream, and then repeatedly gets the position from the stream.
 
 A stream can be created for any function call (except property setters) by
 adding ``_stream`` to the end of the function's name. This returns a stream
-object of type :class:`krpc::Stream<T>`, where ``T`` is the return type of the
-original function. The most recent value of the stream can be obtained by
-calling :func:`krpc::Stream<T>::operator()()`. A stream can be stopped and
-removed from the server by calling :func:`krpc::Stream<T>::remove()` on the
-stream object. All of a clients streams are automatically stopped when it
-disconnects.
+object of type :class:`template\<typename T> krpc::Stream\<T>`, where ``T`` is
+the return type of the original function. The most recent value of the stream
+can be obtained by calling :func:`template\<typename T> krpc::Stream\<T>::operator()()`.
+A stream can be stopped and removed from the server by calling
+:func:`template\<typename T> krpc::Stream\<T>::remove()` on the stream
+object. All of a clients streams are automatically stopped when it disconnects.
 
 Client API Reference
 --------------------
@@ -162,7 +162,7 @@ Client API Reference
 .. function:: Client connect(const std::string& name = "", const std::string& address = "127.0.0.1", unsigned int rpc_port = 50000, unsigned int stream_port = 50001)
 
    This function creates a connection to a kRPC server. It returns a
-   :class:`krpc::Client` object, through which the server can be communicated
+   :class:`Client` object, through which the server can be communicated
    with.
 
    :parameters:
@@ -183,7 +183,7 @@ Client API Reference
 
    This class provides the interface for communicating with the server. It is
    used by service class instances to invoke remote procedure calls. Instances
-   of this class can be obtained by calling :func:`krpc::connect`.
+   of this class can be obtained by calling :func:`connect`.
 
 .. namespace:: krpc::services
 
@@ -217,7 +217,7 @@ Client API Reference
 
 .. namespace:: krpc
 
-.. class:: Stream<T>
+.. class:: template<typename T> Stream<T>
 
    A stream object. Streams are created by calling a function with ``_stream``
    appended to its name.
