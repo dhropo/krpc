@@ -166,8 +166,6 @@ namespace KRPC.SpaceCenter.Services
             var game = GamePersistence.LoadGame (name, HighLogic.SaveFolder, true, false);
             if (game == null || game.flightState == null || !game.compatible)
                 throw new ArgumentException ("Failed to load " + name);
-            if (game.flightState.protoVessels.Count == 0)
-                throw new ArgumentException ("Failed to load vessel id 0 from " + name);
             FlightDriver.StartAndFocusVessel (game, game.flightState.activeVesselIdx);
             throw new YieldException (new ParameterizedContinuationVoid<int> (WaitForVesselSwitch, 0));
         }
@@ -194,6 +192,14 @@ namespace KRPC.SpaceCenter.Services
         public static void Quickload ()
         {
             Load ("quicksave");
+        }
+
+        /// <summary>
+        /// An object that can be used to control the camera.
+        /// </summary>
+        [KRPCProperty]
+        public static Camera Camera {
+            get { return new Camera (); }
         }
 
         /// <summary>
@@ -298,7 +304,7 @@ namespace KRPC.SpaceCenter.Services
             if (ActiveVessel.InternalVessel.LandedOrSplashed)
                 return true;
             // Below altitude limit
-            var altitude = ActiveVessel.InternalVessel.mainBody.GetAltitude (ActiveVessel.InternalVessel.CoM);
+            var altitude = ActiveVessel.InternalVessel.mainBody.GetAltitude (ActiveVessel.InternalVessel.findWorldCenterOfMass ());
             var altitudeLimit = TimeWarp.fetch.GetAltitudeLimit (factor, ActiveVessel.InternalVessel.mainBody);
             if (altitude < altitudeLimit)
                 return false;
@@ -326,29 +332,29 @@ namespace KRPC.SpaceCenter.Services
 
         /// <summary>
         /// Uses time acceleration to warp forward to a time in the future, specified
-        /// by universal time <paramref name="UT"/>. This call blocks until the desired
+        /// by universal time <paramref name="ut"/>. This call blocks until the desired
         /// time is reached. Uses regular "on-rails" or physical time warp as appropriate.
         /// For example, physical time warp is used when the active vessel is traveling
         /// through an atmosphere. When using regular "on-rails" time warp, the warp
         /// rate is limited by <paramref name="maxRailsRate"/>, and when using physical
         /// time warp, the warp rate is limited by <paramref name="maxPhysicsRate"/>.
         /// </summary>
-        /// <param name="UT">The universal time to warp to, in seconds.</param>
+        /// <param name="ut">The universal time to warp to, in seconds.</param>
         /// <param name="maxRailsRate">The maximum warp rate in regular "on-rails" time warp.</param>
         /// <param name="maxPhysicsRate">The maximum warp rate in physical time warp.</param>
         /// <returns>When the time warp is complete.</returns>
         [KRPCProcedure]
-        public static void WarpTo (double UT, float maxRailsRate = 100000, float maxPhysicsRate = 2)
+        public static void WarpTo (double ut, float maxRailsRate = 100000, float maxPhysicsRate = 2)
         {
-            float rate = Mathf.Clamp ((float)(UT - Planetarium.GetUniversalTime ()), 1f, maxRailsRate);
+            float rate = Mathf.Clamp ((float)(ut - Planetarium.GetUniversalTime ()), 1f, maxRailsRate);
 
             if (CanRailsWarpAt ())
                 RailsWarpAtRate (rate);
             else
                 PhysicsWarpAtRate (Mathf.Min (rate, Math.Min (maxRailsRate, maxPhysicsRate)));
 
-            if (Planetarium.GetUniversalTime () < UT)
-                throw new YieldException (new ParameterizedContinuationVoid<double,float,float> (WarpTo, UT, maxRailsRate, maxPhysicsRate));
+            if (Planetarium.GetUniversalTime () < ut)
+                throw new YieldException (new ParameterizedContinuationVoid<double,float,float> (WarpTo, ut, maxRailsRate, maxPhysicsRate));
             else if (TimeWarp.CurrentRateIndex > 0) {
                 SetWarpFactor (TimeWarp.Modes.HIGH, 0);
             }
@@ -515,49 +521,6 @@ namespace KRPC.SpaceCenter.Services
         [KRPCProperty]
         public static bool FARAvailable {
             get { return ExternalAPI.FAR.IsAvailable; }
-        }
-
-        /// <summary>
-        /// Whether <a href="http://forum.kerbalspaceprogram.com/index.php?/topic/75245-11-remotetech-v1610-2016-04-12/">RemoteTech</a> is installed.
-        /// </summary>
-        [KRPCProperty]
-        public static bool RemoteTechAvailable {
-            get { return ExternalAPI.RemoteTech.IsAvailable; }
-        }
-
-        /// <summary>
-        /// Draw a direction vector on the active vessel.
-        /// </summary>
-        /// <param name="direction">Direction to draw the line in.</param>
-        /// <param name="referenceFrame">Reference frame that the direction is in.</param>
-        /// <param name="color">The color to use for the line, as an RGB color.</param>
-        /// <param name="length">The length of the line. Defaults to 10.</param>
-        [KRPCProcedure]
-        public static void DrawDirection (Tuple3 direction, ReferenceFrame referenceFrame, Tuple3 color, float length = 10f)
-        {
-            DrawAddon.AddDirection (direction.ToVector (), referenceFrame, color, length);
-        }
-
-        /// <summary>
-        /// Draw a line.
-        /// </summary>
-        /// <param name="start">Position of the start of the line.</param>
-        /// <param name="end">Position of the end of the line.</param>
-        /// <param name="referenceFrame">Reference frame that the position are in.</param>
-        /// <param name="color">The color to use for the line, as an RGB color.</param>
-        [KRPCProcedure]
-        public static void DrawLine (Tuple3 start, Tuple3 end, ReferenceFrame referenceFrame, Tuple3 color)
-        {
-            DrawAddon.AddLine (start.ToVector (), end.ToVector (), referenceFrame, color);
-        }
-
-        /// <summary>
-        /// Remove all directions and lines currently being drawn.
-        /// </summary>
-        [KRPCProcedure]
-        public static void ClearDrawing ()
-        {
-            DrawAddon.ClearDrawing ();
         }
     }
 }

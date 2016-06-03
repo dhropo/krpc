@@ -1,7 +1,7 @@
 load('/tools/build/csharp', 'csharp_library', 'csharp_nunit_test', 'csharp_assembly_info')
 load('/tools/ServiceDefinitions/build', 'service_definitions')
 load('/tools/build/image', 'png_images')
-load('/config', 'version', 'assembly_version', 'author')
+load('/config', 'version', 'ksp_version', 'assembly_version', 'author')
 
 filegroup(
     name = 'server',
@@ -27,6 +27,7 @@ csharp_assembly_info(
     description = 'RPC server for Kerbal Space Program',
     copyright = author,
     version = assembly_version,
+    custom = {'KSPVersion': ksp_version},
     internals_visible_to = ['KRPC.Test', 'TestServer', 'ServiceDefinitions', 'DynamicProxyGenAssembly2'],
     visibility = ['//tools/ServiceDefinitions:__pkg__'] # Make visible to ServiceDefinitions so it can build KRPC.dll with .NET 4.5 references
 )
@@ -46,6 +47,8 @@ csharp_library(
         '//tools/build/ksp:Assembly-CSharp',
         '//tools/build/ksp:Assembly-CSharp-firstpass',
         '//tools/build/ksp:UnityEngine',
+        '//tools/build/ksp:UnityEngine.UI',
+        '//tools/build/ksp:KSPUtil',
         '//tools/build/ksp:mscorlib',
         '//tools/build/ksp:System',
         '//tools/build/ksp:System.Core',
@@ -78,6 +81,8 @@ csharp_nunit_test(
         '//tools/build/ksp:Assembly-CSharp',
         '//tools/build/ksp:Assembly-CSharp-firstpass',
         '//tools/build/ksp:UnityEngine',
+        '//tools/build/ksp:UnityEngine.UI',
+        '//tools/build/ksp:KSPUtil',
         '//tools/build/mono-4.5:mscorlib',
         '//tools/build/mono-4.5:System',
         '//tools/build/mono-4.5:System.Core',

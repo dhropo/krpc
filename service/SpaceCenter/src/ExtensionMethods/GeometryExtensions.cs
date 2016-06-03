@@ -1,12 +1,25 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Tuple2 = KRPC.Utils.Tuple<double,double>;
 using Tuple3 = KRPC.Utils.Tuple<double,double,double>;
 using Tuple4 = KRPC.Utils.Tuple<double,double,double,double>;
 
 namespace KRPC.SpaceCenter.ExtensionMethods
 {
-    static class GeometryExtensions
+    /// <summary>
+    /// Extensions for geometry classes
+    /// </summary>
+    public static class GeometryExtensions
     {
+        /// <summary>
+        /// Convert a vector to a tuple
+        /// </summary>
+        public static Tuple2 ToTuple (this Vector2 v)
+        {
+            return new Tuple2 (v.x, v.y);
+        }
+
         /// <summary>
         /// Convert a vector to a tuple
         /// </summary>
@@ -16,11 +29,35 @@ namespace KRPC.SpaceCenter.ExtensionMethods
         }
 
         /// <summary>
+        /// Convert a vector to a tuple
+        /// </summary>
+        public static Tuple3 ToTuple (this Vector3 v)
+        {
+            return new Tuple3 (v.x, v.y, v.z);
+        }
+
+        /// <summary>
+        /// Convert a tuple to a vector
+        /// </summary>
+        public static Vector2 ToVector (this Tuple2 t)
+        {
+            return new Vector2 ((float)t.Item1, (float)t.Item2);
+        }
+
+        /// <summary>
         /// Convert a tuple to a vector
         /// </summary>
         public static Vector3d ToVector (this Tuple3 t)
         {
             return new Vector3d (t.Item1, t.Item2, t.Item3);
+        }
+
+        /// <summary>
+        /// Convert a quaternion to tuple
+        /// </summary>
+        public static Tuple4 ToTuple (this Quaternion q)
+        {
+            return new Tuple4 (q.x, q.y, q.z, q.w);
         }
 
         /// <summary>
@@ -40,27 +77,15 @@ namespace KRPC.SpaceCenter.ExtensionMethods
         }
 
         /// <summary>
-        /// Compute the sign of a vector's elements
+        /// Convert a Matrix4x4 (simulating a Matrix3x3) to a tuple of tuples
         /// </summary>
-        public static Vector3d Sign (this Vector3d v)
+        public static IList<double> ToList (this Matrix4x4 m)
         {
-            return new Vector3d (Math.Sign (v.x), Math.Sign (v.y), Math.Sign (v.z));
-        }
-
-        /// <summary>
-        /// Raise the elements of a vector's elements to the given exponent
-        /// </summary>
-        public static Vector3d Pow (this Vector3d v, double e)
-        {
-            return new Vector3d (Math.Pow (v.x, e), Math.Pow (v.y, e), Math.Pow (v.z, e));
-        }
-
-        /// <summary>
-        /// Compute the element-wise inverse of a vector
-        /// </summary>
-        public static Vector3d Inverse (this Vector3d v)
-        {
-            return new Vector3d (1d / v.x, 1d / v.y, 1d / v.z);
+            return new List<double> (new double[] {
+                m [0, 0], m [0, 1], m [0, 2],
+                m [1, 0], m [1, 1], m [1, 2],
+                m [2, 0], m [2, 1], m [2, 2]
+            });
         }
 
         /// <summary>
@@ -77,26 +102,6 @@ namespace KRPC.SpaceCenter.ExtensionMethods
         public static double NormAngle (double angle)
         {
             return angle - 360d * Math.Floor ((angle + 180d) / 360d);
-        }
-
-        /// <summary>
-        /// Apply NormAngle element-wise to a vector
-        /// </summary>
-        public static Vector3d ReduceAngles (this Vector3d v)
-        {
-            return new Vector3d (NormAngle (v.x), NormAngle (v.y), NormAngle (v.z));
-        }
-
-        /// <summary>
-        /// Round all values in a vector to the given precision
-        /// </summary>
-        public static Vector3 Round (this Vector3 v, int decimalPlaces)
-        {
-            // TODO: remove horrid casts
-            return new Vector3 (
-                (float)Math.Round ((double)v.x, decimalPlaces),
-                (float)Math.Round ((double)v.y, decimalPlaces),
-                (float)Math.Round ((double)v.z, decimalPlaces));
         }
 
         /// <summary>
@@ -158,8 +163,30 @@ namespace KRPC.SpaceCenter.ExtensionMethods
             return angle;
         }
 
+        /// <summary>
+        /// Convert radians to degrees.
+        /// </summary>
+        public static float ToDegrees (float radians)
+        {
+            return radians * (180f / (float)Math.PI);
+        }
+
+        /// <summary>
+        /// Convert degrees to radians.
+        /// </summary>
+        public static float ToRadians (float degrees)
+        {
+            return degrees * ((float)Math.PI / 180f);
+        }
+
+        /// <summary>
+        /// Axis ordering
+        /// </summary>
         public enum AxisOrder
         {
+            /// <summary>
+            /// y-z-x axis order
+            /// </summary>
             YZX
         }
 
@@ -255,23 +282,6 @@ namespace KRPC.SpaceCenter.ExtensionMethods
         }
 
         /// <summary>
-        /// Compute the norm of a quaternion
-        /// </summary>
-        public static double Norm (this QuaternionD q)
-        {
-            return Math.Sqrt (q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
-        }
-
-        /// <summary>
-        /// Normalize a quaternion
-        /// </summary>
-        public static QuaternionD Normalize (this QuaternionD q)
-        {
-            var sf = 1d / q.Norm ();
-            return new QuaternionD (q.x * sf, q.y * sf, q.z * sf, q.w * sf);
-        }
-
-        /// <summary>
         /// Implementation of QuaternionD.LookRotation
         /// </summary>
         public static QuaternionD LookRotation2 (Vector3d forward, Vector3d up)
@@ -292,6 +302,73 @@ namespace KRPC.SpaceCenter.ExtensionMethods
         public static Vector3d ProjectVectorOntoPlane (Vector3d normal, Vector3d v)
         {
             return v - normal * Vector3d.Dot (normal, v);
+        }
+
+        /// <summary>
+        /// Add a 4x4 Matrix into another one (does not allocate)
+        /// </summary>
+        public static Matrix4x4 Add (this Matrix4x4 left, Matrix4x4 right)
+        {
+            Matrix4x4 m = Matrix4x4.zero;
+            for (int i = 0; i < 4; i++)
+                m.SetColumn (i, left.GetColumn (i) + right.GetColumn (i));
+            return m;
+        }
+
+        /// <summary>
+        /// Multiply a 4x4 Matrix by a scalar (simulating 3x3 matrix) (does not allocate)
+        /// </summary>
+        public static Matrix4x4 MultiplyScalar (this Matrix4x4 left, float right)
+        {
+            for (int i = 0; i < 3; i++)
+                for (int j = 0; j < 3; j++)
+                    left [i, j] = left [i, j] * right;
+            return left;
+        }
+
+        /// <summary>
+        /// Returns the diagonal 3-vector from the 4x4 matrix (simulating 3x3 matrix)
+        /// </summary>
+        public static Vector3d Diag (this Matrix4x4 m)
+        {
+            Vector3d v = Vector3d.zero;
+            for (int i = 0; i < 3; i++)
+                v [i] = m [i, i];
+            return v;
+        }
+
+        /// <summary>
+        /// Constructs diagonal matrix from a float (Identity * val)
+        /// </summary>
+        public static Matrix4x4 ToDiagonalMatrix (this float v)
+        {
+            Matrix4x4 m = Matrix4x4.identity;
+            for (int i = 0; i < 4; i++)
+                m [i, i] = v;
+            return m;
+        }
+
+        /// <summary>
+        /// Constructs diagonal matrix from a 3-vector (simulating 3x3 matrix)
+        /// </summary>
+        public static Matrix4x4 ToDiagonalMatrix (this Vector3 v)
+        {
+            Matrix4x4 m = Matrix4x4.identity;
+            for (int i = 0; i < 3; i++)
+                m [i, i] = v [i];
+            return m;
+        }
+
+        /// <summary>
+        /// Construct the outer product of two 3-vectors as a 4x4 matrix
+        /// </summary>
+        public static Matrix4x4 OuterProduct (this Vector3 left, Vector3 right)
+        {
+            Matrix4x4 m = Matrix4x4.identity;
+            for (int i = 0; i < 3; i++)
+                for (int j = 0; j < 3; j++)
+                    m [i, j] = left [i] * right [j];
+            return m;
         }
     }
 }

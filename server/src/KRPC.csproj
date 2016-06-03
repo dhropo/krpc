@@ -32,19 +32,42 @@
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Choose>
+    <When Condition=" '$(Configuration)' == 'Release' ">
+      <ItemGroup>
+        <Reference Include="mscorlib">
+          <HintPath>..\..\lib\ksp\KSP_Data\Managed\mscorlib.dll</HintPath>
+        </Reference>
+        <Reference Include="System">
+          <HintPath>..\..\lib\ksp\KSP_Data\Managed\System.dll</HintPath>
+        </Reference>
+        <Reference Include="System.Core">
+          <HintPath>..\..\lib\ksp\KSP_Data\Managed\System.Core.dll</HintPath>
+        </Reference>
+        <Reference Include="System.Xml.Linq">
+          <HintPath>..\..\lib\ksp\KSP_Data\Managed\System.Xml.Linq.dll</HintPath>
+        </Reference>
+        <Reference Include="System.Xml">
+          <HintPath>..\..\lib\ksp\KSP_Data\Managed\System.Xml.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <Reference Include="System" />
+        <Reference Include="System.Core" />
+        <Reference Include="System.Xml" />
+        <Reference Include="System.Xml.Linq" />
+        <Reference Include="System.IO">
+          <HintPath>..\..\bazel-krpc\lib\mono-4.5\Facades\System.IO.dll</HintPath>
+        </Reference>
+        <Reference Include="System.Runtime">
+          <HintPath>..\..\bazel-krpc\lib\mono-4.5\Facades\System.Runtime.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
   <ItemGroup>
-    <Reference Include="System">
-      <HintPath>..\..\lib\ksp\KSP_Data\Managed\System.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core">
-      <HintPath>..\..\lib\ksp\KSP_Data\Managed\System.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq">
-      <HintPath>..\..\lib\ksp\KSP_Data\Managed\System.Xml.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml">
-      <HintPath>..\..\lib\ksp\KSP_Data\Managed\System.Xml.dll</HintPath>
-    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\lib\ksp\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
@@ -54,11 +77,14 @@
     <Reference Include="UnityEngine">
       <HintPath>..\..\lib\ksp\KSP_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\lib\ksp\KSP_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="KSPUtil">
+      <HintPath>..\..\lib\ksp\KSP_Data\Managed\KSPUtil.dll</HintPath>
+    </Reference>
     <Reference Include="Google.Protobuf">
       <HintPath>..\..\bazel-krpc\external\csharp_protobuf_net35\file\Google.Protobuf.dll</HintPath>
-    </Reference>
-    <Reference Include="mscorlib">
-      <HintPath>..\..\lib\ksp\KSP_Data\Managed\mscorlib.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -75,7 +101,10 @@
     <Compile Include="Continuations\YieldException.cs" />
     <Compile Include="KRPCAddon.cs" />
     <Compile Include="KRPCConfiguration.cs" />
+    <Compile Include="KRPCCore.cs" />
     <Compile Include="KRPCServer.cs" />
+    <Compile Include="Properties\AssemblyKSPVersion.cs" />
+    <Compile Include="Server\ByteOutputStreamAdapter.cs" />
     <Compile Include="Server\ClientActivityArgs.cs" />
     <Compile Include="Server\ClientConnectedArgs.cs" />
     <Compile Include="Server\ClientConnectionRequest.cs" />
@@ -86,21 +115,27 @@
     <Compile Include="Server\IClientEventArgs.cs" />
     <Compile Include="Server\IServer.cs" />
     <Compile Include="Server\IStream.cs" />
-    <Compile Include="Server\Net\NetworkInformation.cs" />
-    <Compile Include="Server\Net\TCPClient.cs" />
-    <Compile Include="Server\Net\TCPServer.cs" />
-    <Compile Include="Server\Net\TCPStream.cs" />
-    <Compile Include="Server\RPC\MalformedRequestException.cs" />
-    <Compile Include="Server\RPC\NoRequestException.cs" />
-    <Compile Include="Server\RPC\RequestBufferOverflowException.cs" />
-    <Compile Include="Server\RPC\RPCClient.cs" />
-    <Compile Include="Server\RPC\RPCServer.cs" />
-    <Compile Include="Server\RPC\RPCStream.cs" />
+    <Compile Include="Server\Message\MalformedRequestException.cs" />
+    <Compile Include="Server\Message\NoRequestException.cs" />
+    <Compile Include="Server\Message\RPCClient.cs" />
+    <Compile Include="Server\Message\RPCServer.cs" />
+    <Compile Include="Server\Message\RPCStream.cs" />
+    <Compile Include="Server\Message\StreamClient.cs" />
+    <Compile Include="Server\Message\StreamServer.cs" />
+    <Compile Include="Server\Message\StreamStream.cs" />
+    <Compile Include="Server\ProtocolBuffers\Encoder.cs" />
+    <Compile Include="Server\ProtocolBuffers\MessageExtensions.cs" />
+    <Compile Include="Server\ProtocolBuffers\RPCClient.cs" />
+    <Compile Include="Server\ProtocolBuffers\RPCServer.cs" />
+    <Compile Include="Server\ProtocolBuffers\RPCStream.cs" />
+    <Compile Include="Server\ProtocolBuffers\StreamClient.cs" />
+    <Compile Include="Server\ProtocolBuffers\StreamServer.cs" />
+    <Compile Include="Server\ProtocolBuffers\StreamStream.cs" />
     <Compile Include="Server\ServerException.cs" />
-    <Compile Include="Server\Stream\StreamClient.cs" />
-    <Compile Include="Server\Stream\StreamRequest.cs" />
-    <Compile Include="Server\Stream\StreamServer.cs" />
-    <Compile Include="Server\Stream\StreamStream.cs" />
+    <Compile Include="Server\TCP\NetworkInformation.cs" />
+    <Compile Include="Server\TCP\TCPClient.cs" />
+    <Compile Include="Server\TCP\TCPServer.cs" />
+    <Compile Include="Server\TCP\TCPStream.cs" />
     <Compile Include="ServicesChecker.cs" />
     <Compile Include="Service\Attributes\KRPCClassAttribute.cs" />
     <Compile Include="Service\Attributes\KRPCEnumAttribute.cs" />
@@ -114,6 +149,21 @@
     <Compile Include="Service\GameScene.cs" />
     <Compile Include="Service\IProcedureHandler.cs" />
     <Compile Include="Service\KRPC.cs" />
+    <Compile Include="Service\Messages\Argument.cs" />
+    <Compile Include="Service\Messages\Class.cs" />
+    <Compile Include="Service\Messages\Enumeration.cs" />
+    <Compile Include="Service\Messages\EnumerationValue.cs" />
+    <Compile Include="Service\Messages\IMessage.cs" />
+    <Compile Include="Service\Messages\NoMessage.cs" />
+    <Compile Include="Service\Messages\Parameter.cs" />
+    <Compile Include="Service\Messages\Procedure.cs" />
+    <Compile Include="Service\Messages\Response.cs" />
+    <Compile Include="Service\Messages\Request.cs" />
+    <Compile Include="Service\Messages\Service.cs" />
+    <Compile Include="Service\Messages\Services.cs" />
+    <Compile Include="Service\Messages\Status.cs" />
+    <Compile Include="Service\Messages\StreamMessage.cs" />
+    <Compile Include="Service\Messages\StreamResponse.cs" />
     <Compile Include="Service\ObjectStore.cs" />
     <Compile Include="Service\ProcedureHandler.cs" />
     <Compile Include="Service\ProcedureParameter.cs" />
@@ -128,6 +178,7 @@
     <Compile Include="Service\Scanner\ServiceSignature.cs" />
     <Compile Include="Service\ServiceException.cs" />
     <Compile Include="Service\Services.cs" />
+    <Compile Include="Service\StreamRequest.cs" />
     <Compile Include="Service\TypeUtils.cs" />
     <Compile Include="UI\ClientConnectingDialog.cs" />
     <Compile Include="UI\ClientDisconnectDialog.cs" />
@@ -139,6 +190,7 @@
     <Compile Include="UI\OptionDialog.cs" />
     <Compile Include="UI\Skin.cs" />
     <Compile Include="UI\Window.cs" />
+    <Compile Include="Utils\APILoader.cs" />
     <Compile Include="Utils\ConfigurationStorage.cs" />
     <Compile Include="Utils\ConfigurationStorageNode.cs" />
     <Compile Include="Utils\DocumentationExtensions.cs" />
@@ -149,7 +201,6 @@
     <Compile Include="Utils\IScheduler.cs" />
     <Compile Include="Utils\KSPAddonImproved.cs" />
     <Compile Include="Utils\Logger.cs" />
-    <Compile Include="Utils\ProtocolBuffers.cs" />
     <Compile Include="Utils\RectStorage.cs" />
     <Compile Include="Utils\Reflection.cs" />
     <Compile Include="Utils\RoundRobinScheduler.cs" />

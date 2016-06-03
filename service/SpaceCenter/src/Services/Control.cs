@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using KRPC.Continuations;
 using KRPC.Service.Attributes;
-using KRPC.Utils;
 using KRPC.SpaceCenter.ExtensionMethods;
+using KRPC.Utils;
+using KSP.UI.Screens;
 
 namespace KRPC.SpaceCenter.Services
 {
@@ -24,7 +25,7 @@ namespace KRPC.SpaceCenter.Services
 
         internal Control (global::Vessel vessel)
         {
-            this.vesselId = vessel.id;
+            vesselId = vessel.id;
         }
 
         /// <summary>
@@ -86,7 +87,7 @@ namespace KRPC.SpaceCenter.Services
             // Update the UI buttons
             var modeIndex = (int)vessel.Autopilot.Mode;
             var modeButtons = UnityEngine.Object.FindObjectOfType<VesselAutopilotUI> ().modeButtons;
-            modeButtons.ElementAt<RUIToggleButton> (modeIndex).SetTrue (true, true);
+            modeButtons [modeIndex].SetState (true);
         }
 
         /// <summary>
@@ -96,20 +97,12 @@ namespace KRPC.SpaceCenter.Services
         [KRPCProperty]
         public SpeedMode SpeedMode {
             get { return GetSpeedMode (); }
-            set {
-                var startMode = FlightUIController.speedDisplayMode;
-                var mode = value.FromSpeedMode ();
-                while (FlightUIController.speedDisplayMode != mode) {
-                    FlightUIController.fetch.cycleSpdModes ();
-                    if (FlightUIController.speedDisplayMode == startMode)
-                        break;
-                }
-            }
+            set { FlightGlobals.SetSpeedMode (value.FromSpeedMode ()); }
         }
 
         internal static SpeedMode GetSpeedMode ()
         {
-            return FlightUIController.speedDisplayMode.ToSpeedMode ();
+            return FlightGlobals.speedDisplayMode.ToSpeedMode ();
         }
 
         /// <summary>
@@ -273,16 +266,16 @@ namespace KRPC.SpaceCenter.Services
         {
             if (vesselId != FlightGlobals.ActiveVessel.id)
                 throw new InvalidOperationException ("Cannot activate stage; vessel is not the active vessel");
-            if (!Staging.separate_ready)
+            if (!StageManager.CanSeparate)
                 throw new YieldException (new ParameterizedContinuation<IList<Vessel>> (ActivateNextStage));
             var preVessels = FlightGlobals.Vessels.ToArray ();
-            Staging.ActivateNextStage ();
+            StageManager.ActivateNextStage ();
             return PostActivateStage (preVessels);
         }
 
         IList<Vessel> PostActivateStage (global::Vessel[] preVessels)
         {
-            if (!Staging.separate_ready)
+            if (!StageManager.CanSeparate)
                 throw new YieldException (new ParameterizedContinuation<IList<Vessel>, global::Vessel[]> (PostActivateStage, preVessels));
             var postVessels = FlightGlobals.Vessels;
             return postVessels.Except (preVessels).Select (vessel => new Vessel (vessel)).ToList ();
@@ -332,16 +325,16 @@ namespace KRPC.SpaceCenter.Services
         /// Optionally sets the magnitude of the delta-v for the maneuver node
         /// in the prograde, normal and radial directions.
         /// </summary>
-        /// <param name="UT">Universal time of the maneuver node.</param>
+        /// <param name="ut">Universal time of the maneuver node.</param>
         /// <param name="prograde">Delta-v in the prograde direction.</param>
         /// <param name="normal">Delta-v in the normal direction.</param>
         /// <param name="radial">Delta-v in the radial direction.</param>
         [KRPCMethod]
-        public Node AddNode (double UT, float prograde = 0, float normal = 0, float radial = 0)
+        public Node AddNode (double ut, float prograde = 0, float normal = 0, float radial = 0)
         {
             if (vesselId != FlightGlobals.ActiveVessel.id)
                 throw new InvalidOperationException ("Cannot add maneuver node; vessel is not the active vessel");
-            return new Node (InternalVessel, UT, prograde, normal, radial);
+            return new Node (InternalVessel, ut, prograde, normal, radial);
         }
 
         /// <summary>

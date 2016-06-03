@@ -4,9 +4,9 @@ using System.Linq;
 using KRPC.Continuations;
 using KRPC.Server;
 using KRPC.Service.Attributes;
-using KRPC.Utils;
 using KRPC.SpaceCenter.ExtensionMethods;
 using KRPC.SpaceCenter.Utils;
+using KRPC.Utils;
 using UnityEngine;
 using Tuple3 = KRPC.Utils.Tuple<double, double, double>;
 
@@ -16,6 +16,10 @@ namespace KRPC.SpaceCenter.Services
     /// Provides basic auto-piloting utilities for a vessel.
     /// Created by calling <see cref="Vessel.AutoPilot"/>.
     /// </summary>
+    /// <remarks>
+    /// If a client engages the auto-pilot and then closes its connection to the server,
+    /// the auto-pilot will be disengaged and its target reference frame, direction and roll reset to default.
+    /// </remarks>
     [KRPCClass (Service = "SpaceCenter")]
     public sealed class AutoPilot : Equatable<AutoPilot>
     {
@@ -69,7 +73,7 @@ namespace KRPC.SpaceCenter.Services
         [KRPCMethod]
         public void Engage ()
         {
-            requestingClient = KRPC.KRPCServer.Context.RPCClient;
+            requestingClient = KRPC.KRPCCore.Context.RPCClient;
             engaged [vesselId] = this;
         }
 
@@ -208,13 +212,13 @@ namespace KRPC.SpaceCenter.Services
         /// <summary>
         /// Sets the gains for the rotation rate PID controller.
         /// </summary>
-        /// <param name="Kp">Proportional gain.</param>
-        /// <param name="Ki">Integral gain.</param>
-        /// <param name="Kd">Derivative gain.</param>
+        /// <param name="kp">Proportional gain.</param>
+        /// <param name="ki">Integral gain.</param>
+        /// <param name="kd">Derivative gain.</param>
         [KRPCMethod]
-        public void SetPIDParameters (float Kp = 1, float Ki = 0, float Kd = 0)
+        public void SetPIDParameters (float kp = 1, float ki = 0, float kd = 0)
         {
-            rotationRateController.pid.SetParameters (Kp, Ki, Kd);
+            rotationRateController.PID.SetParameters (kp, ki, kd);
         }
 
         /// <summary>
@@ -310,8 +314,11 @@ namespace KRPC.SpaceCenter.Services
             var autoPilot = engaged [vessel.id];
             if (autoPilot == null)
                 return false;
-            // If the client that engaged the auto-pilot has disconnected, disengage the auto-pilot
+            // If the client that engaged the auto-pilot has disconnected, disengage and reset the auto-pilot
             if (autoPilot.requestingClient != null && !autoPilot.requestingClient.Connected) {
+                autoPilot.ReferenceFrame = ReferenceFrame.Surface (vessel);
+                autoPilot.TargetDirection = null;
+                autoPilot.TargetRoll = float.NaN;
                 autoPilot.Disengage ();
                 return false;
             }

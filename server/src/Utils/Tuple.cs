@@ -7,6 +7,12 @@ def prepend (s, x): return s + x if x != '' else ''
 cog.out("""
 namespace KRPC.Utils
 {
+    /// <summary>
+    /// Interface for tuples.
+    /// </summary>
+    public interface ITuple
+    {
+    }
 """)
 
 for n in range(1,int(nargs)+1):
@@ -14,12 +20,12 @@ for n in range(1,int(nargs)+1):
     /// <summary>
     /// A tuple with """ + str(n) + """ elements
     /// </summary>
-    public class Tuple<""" + ','.join(['T%d' % (i+1) for i in range(n)]) + """>
+    public class Tuple<""" + ','.join(['T%d' % (i+1) for i in range(n)]) + """> : ITuple
     {""")
     for i in range(n):
         cog.out("""
         /// <summary>
-        /// Get/set the value of element """ + str(n) + """
+        /// Get/set the value of element """ + str(i+1) + """
         /// </summary>
         """ + 'public T%d Item%d { get; private set; }' % (i+1,i+1) + '\n')
     cog.out("""
@@ -53,11 +59,17 @@ cog.outl('}')
 
 namespace KRPC.Utils
 {
+    /// <summary>
+    /// Interface for tuples.
+    /// </summary>
+    public interface ITuple
+    {
+    }
 
     /// <summary>
     /// A tuple with 1 elements
     /// </summary>
-    public class Tuple<T1>
+    public class Tuple<T1> : ITuple
     {
         /// <summary>
         /// Get/set the value of element 1
@@ -76,10 +88,10 @@ namespace KRPC.Utils
     /// <summary>
     /// A tuple with 2 elements
     /// </summary>
-    public class Tuple<T1,T2>
+    public class Tuple<T1,T2> : ITuple
     {
         /// <summary>
-        /// Get/set the value of element 2
+        /// Get/set the value of element 1
         /// </summary>
         public T1 Item1 { get; private set; }
 
@@ -101,15 +113,15 @@ namespace KRPC.Utils
     /// <summary>
     /// A tuple with 3 elements
     /// </summary>
-    public class Tuple<T1,T2,T3>
+    public class Tuple<T1,T2,T3> : ITuple
     {
         /// <summary>
-        /// Get/set the value of element 3
+        /// Get/set the value of element 1
         /// </summary>
         public T1 Item1 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 3
+        /// Get/set the value of element 2
         /// </summary>
         public T2 Item2 { get; private set; }
 
@@ -132,20 +144,20 @@ namespace KRPC.Utils
     /// <summary>
     /// A tuple with 4 elements
     /// </summary>
-    public class Tuple<T1,T2,T3,T4>
+    public class Tuple<T1,T2,T3,T4> : ITuple
     {
         /// <summary>
-        /// Get/set the value of element 4
+        /// Get/set the value of element 1
         /// </summary>
         public T1 Item1 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 4
+        /// Get/set the value of element 2
         /// </summary>
         public T2 Item2 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 4
+        /// Get/set the value of element 3
         /// </summary>
         public T3 Item3 { get; private set; }
 
@@ -169,25 +181,25 @@ namespace KRPC.Utils
     /// <summary>
     /// A tuple with 5 elements
     /// </summary>
-    public class Tuple<T1,T2,T3,T4,T5>
+    public class Tuple<T1,T2,T3,T4,T5> : ITuple
     {
         /// <summary>
-        /// Get/set the value of element 5
+        /// Get/set the value of element 1
         /// </summary>
         public T1 Item1 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 5
+        /// Get/set the value of element 2
         /// </summary>
         public T2 Item2 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 5
+        /// Get/set the value of element 3
         /// </summary>
         public T3 Item3 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 5
+        /// Get/set the value of element 4
         /// </summary>
         public T4 Item4 { get; private set; }
 
@@ -212,30 +224,30 @@ namespace KRPC.Utils
     /// <summary>
     /// A tuple with 6 elements
     /// </summary>
-    public class Tuple<T1,T2,T3,T4,T5,T6>
+    public class Tuple<T1,T2,T3,T4,T5,T6> : ITuple
     {
         /// <summary>
-        /// Get/set the value of element 6
+        /// Get/set the value of element 1
         /// </summary>
         public T1 Item1 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 6
+        /// Get/set the value of element 2
         /// </summary>
         public T2 Item2 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 6
+        /// Get/set the value of element 3
         /// </summary>
         public T3 Item3 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 6
+        /// Get/set the value of element 4
         /// </summary>
         public T4 Item4 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 6
+        /// Get/set the value of element 5
         /// </summary>
         public T5 Item5 { get; private set; }
 
@@ -261,35 +273,35 @@ namespace KRPC.Utils
     /// <summary>
     /// A tuple with 7 elements
     /// </summary>
-    public class Tuple<T1,T2,T3,T4,T5,T6,T7>
+    public class Tuple<T1,T2,T3,T4,T5,T6,T7> : ITuple
     {
         /// <summary>
-        /// Get/set the value of element 7
+        /// Get/set the value of element 1
         /// </summary>
         public T1 Item1 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 7
+        /// Get/set the value of element 2
         /// </summary>
         public T2 Item2 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 7
+        /// Get/set the value of element 3
         /// </summary>
         public T3 Item3 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 7
+        /// Get/set the value of element 4
         /// </summary>
         public T4 Item4 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 7
+        /// Get/set the value of element 5
         /// </summary>
         public T5 Item5 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 7
+        /// Get/set the value of element 6
         /// </summary>
         public T6 Item6 { get; private set; }
 
@@ -316,40 +328,40 @@ namespace KRPC.Utils
     /// <summary>
     /// A tuple with 8 elements
     /// </summary>
-    public class Tuple<T1,T2,T3,T4,T5,T6,T7,T8>
+    public class Tuple<T1,T2,T3,T4,T5,T6,T7,T8> : ITuple
     {
         /// <summary>
-        /// Get/set the value of element 8
+        /// Get/set the value of element 1
         /// </summary>
         public T1 Item1 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 8
+        /// Get/set the value of element 2
         /// </summary>
         public T2 Item2 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 8
+        /// Get/set the value of element 3
         /// </summary>
         public T3 Item3 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 8
+        /// Get/set the value of element 4
         /// </summary>
         public T4 Item4 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 8
+        /// Get/set the value of element 5
         /// </summary>
         public T5 Item5 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 8
+        /// Get/set the value of element 6
         /// </summary>
         public T6 Item6 { get; private set; }
 
         /// <summary>
-        /// Get/set the value of element 8
+        /// Get/set the value of element 7
         /// </summary>
         public T7 Item7 { get; private set; }
 

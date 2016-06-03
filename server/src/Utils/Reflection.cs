@@ -10,6 +10,9 @@ namespace KRPC.Utils
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
                 // Get all types that can be loaded from the assembly
+                // FIXME: manually skip inspecting Assembly-CSharp as it causes a crash when running nunit tests
+                if (assembly.FullName.Contains ("Assembly-CSharp"))
+                    continue;
                 Type[] types;
                 try {
                     types = assembly.GetTypes ();
@@ -118,6 +121,22 @@ namespace KRPC.Utils
         public static bool IsPublic (this PropertyInfo property)
         {
             return (property.GetGetMethod () == null || property.GetGetMethod ().IsPublic) && (property.GetSetMethod () == null || property.GetSetMethod ().IsPublic);
+        }
+
+        /// <summary>
+        /// Returns true if the given type is an instance of the given generic type.
+        /// </summary>
+        public static bool IsGenericType (Type type, Type genericType)
+        {
+            while (type != null) {
+                if (type.IsGenericType && type.GetGenericTypeDefinition () == genericType)
+                    return true;
+                foreach (var intType in type.GetInterfaces())
+                    if (IsGenericType (intType, genericType))
+                        return true;
+                type = type.BaseType;
+            }
+            return false;
         }
     }
 }

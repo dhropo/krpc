@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using KRPC.Service.Attributes;
 using KRPC.Utils;
-using KRPC.SpaceCenter.ExtensionMethods;
 
 namespace KRPC.SpaceCenter.Services
 {
@@ -18,8 +14,8 @@ namespace KRPC.SpaceCenter.Services
 
         internal Resource (PartResource resource)
         {
-            this.partId = resource.part.flightID;
-            this.resourceId = resource.info.id;
+            partId = resource.part.flightID;
+            resourceId = resource.info.id;
         }
 
         /// <summary>
@@ -41,7 +37,7 @@ namespace KRPC.SpaceCenter.Services
         /// <summary>
         /// The KSP part.
         /// </summary>
-        public global::Part InternalPart {
+        public Part InternalPart {
             get { return FlightGlobals.FindPartByID (partId); }
         }
 
@@ -58,6 +54,14 @@ namespace KRPC.SpaceCenter.Services
         [KRPCProperty]
         public string Name {
             get { return InternalResource.resourceName; }
+        }
+
+        /// <summary>
+        /// The part containing the resource.
+        /// </summary>
+        [KRPCProperty]
+        public Parts.Part Part {
+            get { return new Parts.Part (InternalPart); }
         }
 
         /// <summary>
@@ -97,8 +101,8 @@ namespace KRPC.SpaceCenter.Services
         /// </summary>
         [KRPCProperty]
         public bool Enabled {
-            get { return InternalResource.flowMode != PartResource.FlowMode.None; }
-            set { InternalResource.flowMode = (value ? PartResource.FlowMode.Both : PartResource.FlowMode.None); }
+            get { return InternalResource.flowState; }
+            set { InternalResource.flowState = value; }
         }
     }
 }
