@@ -163,8 +163,8 @@ http_file(
 
 http_file(
     name = 'python_sphinx',
-    url = 'https://pypi.python.org/packages/source/S/Sphinx/Sphinx-1.4.1.tar.gz',
-    sha256 = 'c6871a784d24aba9270b6b28541537a57e2fcf4d7c799410eba18236bc76d6bc'
+    url = 'https://pypi.python.org/packages/c0/7a/05fc92611f6774b5bbae5ea068122eb513b0d5e54f23186926b2c089c5d5/Sphinx-1.4.2.tar.gz',
+    sha256 = '92ed6b657ff6294f483e58d5280e0a8a2db142a38b30e18da4af74ecdce72584'
 )
 
 http_file(
