@@ -1,50 +1,21 @@
 sudo: required
-dist: trusty
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - wget
-      - pkg-config
-      - python
-      - python-virtualenv
-      - python-pip
-      - texlive-latex-base
-      - texlive-latex-recommended
-      - texlive-fonts-recommended
-      - texlive-latex-extra
-      - librsvg2-bin
-      - lua5.1
-      - liblua5.1-0-dev
-      - inotify-tools
-      - python-dev
-      - libxml2-dev
-      - libxslt1-dev
-
-language: csharp
-mono:
-  - latest
+services:
+  - docker
 
 install:
-  - ./tools/travis-ci/install-luarocks.sh
-  - ./tools/travis-ci/install-bazel.sh
+  - docker pull krpc/buildenv
   - ./tools/travis-ci/install-ksp-libs.sh
+
+before_script:
+  - ./tools/travis-ci/set-version.py
 
 script:
   - stty cols 120
-  - ./tools/travis-ci/set-version.py
-  - bazel build //:krpc //doc:html //doc:compile-scripts //:csproj //tools/krpctools //tools/TestServer:archive
-  - xbuild KRPC.sln
-  - bazel test //:ci-test
-  - tools/dist/genfiles.sh
+  - ./tools/travis-ci/script.sh
 
 after_script:
   - rm -rf lib/ksp
-
-before_deploy:
-  - ./tools/travis-ci/before-deploy.sh
 
 deploy:
   provider: s3
