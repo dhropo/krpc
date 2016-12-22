@@ -37,7 +37,8 @@ RUN apt-get update && apt-get install -y curl && \
     bazel=0.4.3 \
     && rm -rf /var/lib/apt/lists/*
 
+RUN bazel version
 COPY bazelrc /etc/bazel.bazelrc
-RUN groupadd -r -g 1000 build && useradd -r -u 1000 -g build -d /build build
-USER build
 WORKDIR /build
+RUN groupadd -r -g 1000 build && useradd -r -u 1000 -g build -d /build build && chown build:build /build
+USER build
